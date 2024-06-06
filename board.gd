@@ -71,8 +71,8 @@ func setup(width,height):
 	var new=[]
 	for i in piece_templates:
 		new.append([])
-		for a in i:
-			new[-1].append(a+Vector2i(floor(width/2),0))
+		for a in i: #                 floor because tiles should tend left
+			new[-1].append(a+Vector2i(floor(width/2)+1,0))
 	piece_templates=new
 
 func next_piece():
@@ -81,7 +81,7 @@ func next_piece():
 	"""
 	for i in active_piece:
 		set_cell(1,i,active_piece_type,Vector2i.ZERO)
-	
+
 	var num=rng.randi_range(0,len(piece_templates))
 	active_piece=piece_templates[num]
 	active_piece_type=num+3 # because there are three non-tetrominoes in the list (the border and the two backgrounds)
