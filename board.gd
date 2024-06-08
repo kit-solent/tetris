@@ -54,41 +54,54 @@ var rng=RandomNumberGenerator.new()
 
 func _ready():
 	setup(width,height)
+	next_piece()
 
 func _process(delta):
 	if Input.is_action_just_pressed("move left"):
-		pass
+		print("hmm")
+		if can_move_piece(Vector2i.LEFT):
+			print("humm")
+			move_piece(Vector2i.LEFT)
 	if Input.is_action_just_pressed("move right"):
-		pass
+		if can_move_piece(Vector2i.RIGHT):
+			move_piece(Vector2i.RIGHT)
 
 func move_piece(direction:Vector2i):
-	pass
+	# remove the active piece from the board
+	for i in active_piece:
+		set_cell(1,i,-1,Vector2i.ZERO)
+	
+	# move the active piece
+	var new=[]
+	for i in active_piece:
+		new.append(i+direction)
+	active_piece=new
+	
+	# put the active piece back on the board
+	for i in active_piece:
+		set_cell(1,i,active_piece_type,Vector2i.ZERO)
 
 func can_move_piece(direction:Vector2i):
-	pass
-
-func check_piece():
-	if len(active_piece)==0:
-		next_piece()
 	for i in active_piece:
-		# if the cell is another active piece cell then ignore
-		if i+Vector2i.DOWN in active_piece:
+		# if the cell is part of this piece
+		if i+direction in active_piece:
 			continue
-		# if the cell is occupied by another piece
-		if get_cell_source_id(1,i+Vector2i.DOWN)!=-1:
-			next_piece()
-			return
-		# if the cell is a border cell
-		elif get_cell_source_id(0,i+Vector2i.DOWN)==0:
-			next_piece()
-			return
+		
+		# if the cell is a wall
+		if get_cell_source_id(0,i+direction)==0:
+			return false
+		
+		# if the cell is another piece
+		if get_cell_source_id(1,i+direction) in [3,4,5,6,7,8,9]:
+			return false
+	return true
 
 func setup(width,height):
 	clear()
 	# set up the border
 	for w in range(width+2):
-		for h in range(height+2):
-			set_cell(0,Vector2i(w,h),0,Vector2i.ZERO)
+		for h in range(height+1): # the plus on on the heights is so that there is no border at the top.
+			set_cell(0,Vector2i(w,h+1),0,Vector2i.ZERO)
 	
 	# set up the background
 	for h in range(height):
@@ -110,7 +123,7 @@ func next_piece():
 	for i in active_piece:
 		set_cell(1,i,active_piece_type,Vector2i.ZERO)
 
-	var num=rng.randi_range(0,len(piece_templates))
+	var num=rng.randi_range(0,len(piece_templates)-1)
 	active_piece=piece_templates[num]
 	active_piece_type=num+3 # because there are three non-tetrominoes in the list (the border and the two backgrounds)
 	
@@ -121,22 +134,10 @@ func next_frame():
 	"""
 	This method moves the active piece down one block and calles next_piece if needed.
 	"""
-	# remove the active piece from the board
-	for i in active_piece:
-		set_cell(1,i,-1,Vector2i.ZERO)
-	
-	# move the active piece down one space
-	var new=[]
-	for i in active_piece:
-		new.append(i+Vector2i.DOWN)
-	active_piece=new
-	
-	# put the active piece back on the board
-	for i in active_piece:
-		set_cell(1,i,active_piece_type,Vector2i.ZERO)
-	
-	check_piece()
-
+	if can_move_piece(Vector2i.DOWN):
+		move_piece(Vector2i.DOWN)
+	else:
+		next_piece()
 
 func _on_timer_timeout():
 	next_frame()
