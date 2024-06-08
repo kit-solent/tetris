@@ -55,6 +55,34 @@ var rng=RandomNumberGenerator.new()
 func _ready():
 	setup(width,height)
 
+func _process(delta):
+	if Input.is_action_just_pressed("move left"):
+		pass
+	if Input.is_action_just_pressed("move right"):
+		pass
+
+func move_piece(direction:Vector2i):
+	pass
+
+func can_move_piece(direction:Vector2i):
+	pass
+
+func check_piece():
+	if len(active_piece)==0:
+		next_piece()
+	for i in active_piece:
+		# if the cell is another active piece cell then ignore
+		if i+Vector2i.DOWN in active_piece:
+			continue
+		# if the cell is occupied by another piece
+		if get_cell_source_id(1,i+Vector2i.DOWN)!=-1:
+			next_piece()
+			return
+		# if the cell is a border cell
+		elif get_cell_source_id(0,i+Vector2i.DOWN)==0:
+			next_piece()
+			return
+
 func setup(width,height):
 	clear()
 	# set up the border
@@ -109,21 +137,6 @@ func next_frame():
 	
 	check_piece()
 
-func check_piece():
-	if len(active_piece)==0:
-		next_piece()
-	for i in active_piece:
-		# if the cell is another active piece cell then ignore
-		if i+Vector2i.DOWN in active_piece:
-			continue
-		# if the cell is occupied by another piece
-		if get_cell_source_id(1,i+Vector2i.DOWN)!=-1:
-			next_piece()
-			return
-		# if the cell is a border cell
-		elif get_cell_source_id(0,i+Vector2i.DOWN)==0:
-			next_piece()
-			return
 
 func _on_timer_timeout():
 	next_frame()
