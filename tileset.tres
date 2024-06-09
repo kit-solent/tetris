@@ -1,15 +1,23 @@
-[gd_resource type="TileSet" load_steps=23 format=3 uid="uid://llo0blhawewv"]
+[gd_resource type="TileSet" load_steps=39 format=3 uid="uid://llo0blhawewv"]
 
 [ext_resource type="Texture2D" uid="uid://da76d1opiw8s1" path="res://images/border.png" id="1_nul5l"]
 [ext_resource type="Texture2D" uid="uid://bo5iq0hwdlp2n" path="res://images/background_dark.png" id="2_npomi"]
+[ext_resource type="Texture2D" uid="uid://djxyenas47w1u" path="res://images/border_border.png" id="3_2buro"]
 [ext_resource type="Texture2D" uid="uid://cjs3a0bvur7ua" path="res://images/background_light.png" id="3_c6ktn"]
+[ext_resource type="Texture2D" uid="uid://vjnw7u4ti6kb" path="res://images/cyan_border.png" id="4_001h1"]
 [ext_resource type="Texture2D" uid="uid://frksd55q13ll" path="res://images/cyan.png" id="4_xi4fk"]
+[ext_resource type="Texture2D" uid="uid://ci3u7qrwyqhnp" path="res://images/blue_border.png" id="5_q13rc"]
 [ext_resource type="Texture2D" uid="uid://c2yr672736jap" path="res://images/blue.png" id="5_yw4p1"]
+[ext_resource type="Texture2D" uid="uid://qe8qkj5yvntw" path="res://images/orange_border.png" id="6_8sqpl"]
 [ext_resource type="Texture2D" uid="uid://co28ndgacbaev" path="res://images/orange.png" id="6_xutkn"]
+[ext_resource type="Texture2D" uid="uid://cal76kx65yjif" path="res://images/yellow_border.png" id="7_331q2"]
 [ext_resource type="Texture2D" uid="uid://cdt8hp2jbdd4r" path="res://images/yellow.png" id="7_yy333"]
+[ext_resource type="Texture2D" uid="uid://dqmw3y7rgt4qg" path="res://images/green_border.png" id="8_1rtg3"]
 [ext_resource type="Texture2D" uid="uid://bwq2ab85pmvce" path="res://images/green.png" id="8_ff3dj"]
+[ext_resource type="Texture2D" uid="uid://daseoxoomoug6" path="res://images/purple_border.png" id="9_7recj"]
 [ext_resource type="Texture2D" uid="uid://l6vwbokka41d" path="res://images/purple.png" id="9_scwc4"]
 [ext_resource type="Texture2D" uid="uid://cff5bgvfohu3c" path="res://images/red.png" id="10_emhxi"]
+[ext_resource type="Texture2D" uid="uid://cqynqu2ku30sc" path="res://images/red_border.png" id="10_pywup"]
 
 [sub_resource type="TileMapPattern" id="TileMapPattern_8vmil"]
 tile_data = PackedInt32Array(0, 1, 0, 65536, 2, 0, 1, 2, 0, 65537, 1, 0)
@@ -26,6 +34,46 @@ texture_region_size = Vector2i(64, 64)
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_dyoco"]
 resource_name = "Background Dark"
 texture = ExtResource("2_npomi")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4jdgc"]
+texture = ExtResource("3_2buro")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4pugy"]
+texture = ExtResource("4_001h1")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ccskh"]
+texture = ExtResource("5_q13rc")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4jv8t"]
+texture = ExtResource("6_8sqpl")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4i5gu"]
+texture = ExtResource("7_331q2")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_p5a37"]
+texture = ExtResource("8_1rtg3")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2w6xy"]
+texture = ExtResource("9_7recj")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cj011"]
+texture = ExtResource("10_pywup")
 texture_region_size = Vector2i(64, 64)
 0:0/0 = 0
 
@@ -89,5 +137,13 @@ sources/3 = SubResource("TileSetAtlasSource_5msid")
 sources/5 = SubResource("TileSetAtlasSource_t2v7e")
 sources/6 = SubResource("TileSetAtlasSource_lhsqx")
 sources/7 = SubResource("TileSetAtlasSource_1rjup")
+sources/10 = SubResource("TileSetAtlasSource_4jdgc")
+sources/11 = SubResource("TileSetAtlasSource_4pugy")
+sources/12 = SubResource("TileSetAtlasSource_ccskh")
+sources/13 = SubResource("TileSetAtlasSource_4jv8t")
+sources/14 = SubResource("TileSetAtlasSource_4i5gu")
+sources/15 = SubResource("TileSetAtlasSource_p5a37")
+sources/16 = SubResource("TileSetAtlasSource_2w6xy")
+sources/17 = SubResource("TileSetAtlasSource_cj011")
 pattern_0 = SubResource("TileMapPattern_8vmil")
 pattern_1 = SubResource("TileMapPattern_108li")

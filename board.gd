@@ -65,6 +65,16 @@ func _process(delta):
 	if Input.is_action_just_pressed("move right"):
 		if can_move_piece(Vector2i.RIGHT):
 			move_piece(Vector2i.RIGHT)
+	if Input.is_action_just_pressed("move down"):
+		if can_move_piece(Vector2i.DOWN):
+			move_piece(Vector2i.DOWN)
+	if Input.is_action_just_pressed("rotate left"):
+		pass
+	if Input.is_action_just_pressed("rotate right"):
+		pass
+
+func rotate_piece():
+	pass #TODO
 
 func move_piece(direction:Vector2i):
 	# remove the active piece from the board
@@ -80,11 +90,26 @@ func move_piece(direction:Vector2i):
 	# put the active piece back on the board
 	for i in active_piece:
 		set_cell(1,i,active_piece_type,Vector2i.ZERO)
+	
+	place_hint()
 
-func can_move_piece(direction:Vector2i):
-	for i in active_piece:
+var current_hint=[]
+func place_hint():
+	for i in current_hint:
+		set_cell(1,i,-1)
+	current_hint=active_piece.duplicate()
+	while can_move_piece(Vector2i.DOWN,current_hint):
+		var x=[]
+		for i in current_hint:
+			x.append(i+Vector2i.DOWN)
+		current_hint=x
+	for i in current_hint:
+		set_cell(1,i,active_piece_type+8,Vector2i.ZERO)
+
+func can_move_piece(direction:Vector2i,piece=active_piece):
+	for i in piece:
 		# if the cell is part of this piece
-		if i+direction in active_piece:
+		if i+direction in piece:
 			continue
 		
 		# if the cell is a wall
@@ -129,6 +154,8 @@ func next_piece():
 	
 	for i in active_piece:
 		set_cell(1,i,active_piece_type,Vector2i.ZERO)
+	
+	current_hint=[]
 
 func next_frame():
 	"""
