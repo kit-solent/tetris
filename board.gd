@@ -76,6 +76,9 @@ func _process(delta):
 func rotate_piece():
 	pass #TODO
 
+func can_rotate_piece():
+	pass # TODO
+
 func move_piece(direction:Vector2i):
 	# remove the active piece from the board
 	for i in active_piece:
@@ -157,14 +160,44 @@ func next_piece():
 	
 	current_hint=[]
 
+func check_rows_for_deletion():
+	var has_deleted=false
+	for row in range(1,height+1): # because second arg is exclusive and we want to start at 1.
+		var all_full=true
+		for cell in range(1,width+1): # same reason
+			if get_cell_source_id(1,Vector2i(cell,row))==-1:
+				all_full=false
+		if all_full:
+			has_deleted=true
+			for cell in range(1,width+1):
+				set_cell(1,Vector2i(cell,row),-1)
+	return has_deleted
+
+func move_rows_down():
+	for row in range(height,0,-1):
+		var all_empty=true
+		for i in range(1,width+1):
+			if get_cell_source_id(1,Vector2(row,i))!=-1:
+				all_empty=false
+		if all_empty:
+			for x in range(1,width+1):
+				if Vector2i(x,row) in active_piece:
+					continue
+				set_cell(1,Vector2i(x,row),get_cell_source_id(1,Vector2i(x,row-1)),Vector2i.ZERO)
+				set_cell(1,Vector2i(x,row-1),-1)
+
 func next_frame():
 	"""
 	This method moves the active piece down one block and calles next_piece if needed.
+	It also handles the clearing of rows.
 	"""
 	if can_move_piece(Vector2i.DOWN):
 		move_piece(Vector2i.DOWN)
 	else:
 		next_piece()
+	
+	if check_rows_for_deletion():
+		move_rows_down()
 
 func _on_timer_timeout():
 	next_frame()
