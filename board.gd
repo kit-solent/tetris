@@ -4,6 +4,7 @@ extends TileMap
 @export var width:int=10
 @export var height:int=24
 
+const cells=[3,4,5,6,7,8,9] # contains the ids of all cells (not hints or border cells, tetriminoes only)
 var active_piece:Array # An array of the cell coordinates of the active piece
 var active_piece_type:int
 var piece_templates:Array=[
@@ -72,9 +73,13 @@ func _process(delta):
 		pass
 	if Input.is_action_just_pressed("rotate right"):
 		pass
+	if Input.is_action_just_pressed("harddrop"):
+		while can_move_piece(Vector2i.DOWN):
+			move_piece(Vector2i.DOWN)
+		next_piece()
 
 func rotate_piece():
-	pass #TODO
+	pass # TODO
 
 func can_rotate_piece():
 	pass # TODO
@@ -161,25 +166,12 @@ func next_piece():
 	current_hint=[]
 
 func check_rows_for_deletion():
-	var has_deleted=false
 	for row in range(1,height+1): # because second arg is exclusive and we want to start at 1.
 		var all_full=true
 		for cell in range(1,width+1): # same reason
-			if get_cell_source_id(1,Vector2i(cell,row))==-1:
+			if not get_cell_source_id(1,Vector2i(cell,row)) in cells:
 				all_full=false
 		if all_full:
-			has_deleted=true
-			for cell in range(1,width+1):
-				set_cell(1,Vector2i(cell,row),-1)
-	return has_deleted
-
-func move_rows_down():
-	for row in range(height,0,-1):
-		var all_empty=true
-		for i in range(1,width+1):
-			if get_cell_source_id(1,Vector2(row,i))!=-1:
-				all_empty=false
-		if all_empty:
 			for x in range(1,width+1):
 				if Vector2i(x,row) in active_piece:
 					continue
@@ -196,8 +188,7 @@ func next_frame():
 	else:
 		next_piece()
 	
-	if check_rows_for_deletion():
-		move_rows_down()
+	check_rows_for_deletion()
 
 func _on_timer_timeout():
 	next_frame()
