@@ -4,9 +4,11 @@ extends TileMap
 @export var width:int=10
 @export var height:int=24
 
-const cells=[3,4,5,6,7,8,9] # contains the ids of all cells (not hints or border cells, tetriminoes only)
-var active_piece:Array # An array of the cell coordinates of the active piece
-var active_piece_type:int
+const pieces_ofset=3
+const rotations=[0,0.5*PI,PI,1.5*PI]
+var active_piece_id:int # an int reperesenting the index of the active piece in the template list.
+var active_piece_position:Vector2i # reperesents the active pieces location.
+var active_piece_rotation:int # 0=no rotation 1=90deg clockwise 2=180 flip 3=90deg anticlockwise
 var piece_templates:Array=[
 	[   # I
 		Vector2i(-2,0),
@@ -51,6 +53,22 @@ var piece_templates:Array=[
 		Vector2i(0,0),
 	],
 ]
+var piece_centres:Array=[
+	# I
+	Vector2(0,1),
+	# J
+	Vector2(-0.5,0.5),
+	# L
+	Vector2(-0.5,0.5),
+	# O
+	Vector2(0,0),
+	# S
+	Vector2(-0.5,0.5),
+	# T
+	Vector2(-0.5,0.5),
+	# Z
+	Vector2(-0.5,0.5),
+]
 var rng=RandomNumberGenerator.new()
 
 func _ready():
@@ -59,9 +77,7 @@ func _ready():
 
 func _process(delta):
 	if Input.is_action_just_pressed("move left"):
-		print("hmm")
 		if can_move_piece(Vector2i.LEFT):
-			print("humm")
 			move_piece(Vector2i.LEFT)
 	if Input.is_action_just_pressed("move right"):
 		if can_move_piece(Vector2i.RIGHT):
@@ -69,52 +85,98 @@ func _process(delta):
 	if Input.is_action_just_pressed("move down"):
 		if can_move_piece(Vector2i.DOWN):
 			move_piece(Vector2i.DOWN)
-	if Input.is_action_just_pressed("rotate left"):
-		pass
-	if Input.is_action_just_pressed("rotate right"):
-		pass
-	if Input.is_action_just_pressed("harddrop"):
+	if Input.is_action_just_pressed("rotate anticlockwise"): # Z
+		if can_rotate_piece(-1):
+			rotate_piece(-1)
+	if Input.is_action_just_pressed("rotate clockwise"): # UP ARROW
+		if can_rotate_piece(1):
+			rotate_piece(1)
+	if Input.is_action_just_pressed("harddrop"): # SPACE
 		while can_move_piece(Vector2i.DOWN):
 			move_piece(Vector2i.DOWN)
 		next_piece()
 
-func rotate_piece():
-	pass # TODO
+func rotate_piece(rot:int):
+	# this order is important.
+	remove_active_piece() # first the piece must be removed so it can be moved.
+	active_piece_rotation=circularify(active_piece_rotation+rot) # rotate the piece.
+	place_hint() # place the hint before placing the piece.
+	place_active_piece() # then place the piece.
+	# placing the piece after the hint means that when the piece and hint overlap, as
+	# they do when the piece is at the bottom, the piece is drawn over the top.
 
-func can_rotate_piece():
-	pass # TODO
+func circularify(index:int):
+	while index<0:
+		index+=4
+	while index>3:
+		index-=4
+	return index
+
+func can_rotate_piece(rot:int):
+	return true # TODO
+
+func move_after_rotating():
+	for i in rotated_array(piece_templates[active_piece_id],active_piece_rotation):
+		i=i+active_piece_position
+		if get_cell_source_id(0,i)==0 or get_cell_source_id(1,i) in [3,4,5,6,7,8,9]:
+			var x=1
+			while true:
+				
+				
+				assert(x!=0,"x cannot be 0. Somethings wrong. 🎷")
+				if x>0:
+					x=-x
+				elif x<0:
+					x=-x+1
+
+func rotated_array(array,rotation_rad):
+	var x=[]
+	for i in array:
+		i=Vector2(i)
+		i=i.rotated(rotation_rad)
+		x.append(Vector2i(i))
+	return x
+
+func place_active_piece():
+	# draw the active piece to the board.
+	for i in rotated_array(piece_templates[active_piece_id],rotations[active_piece_rotation]):
+		set_cell(1,i+active_piece_position,active_piece_id+pieces_ofset,Vector2i.ZERO)
+
+func remove_active_piece():
+	# remove the active piece from the board.
+	for i in rotated_array(piece_templates[active_piece_id],rotations[active_piece_rotation]):
+		set_cell(1,i+active_piece_position,-1)
 
 func move_piece(direction:Vector2i):
-	# remove the active piece from the board
-	for i in active_piece:
-		set_cell(1,i,-1,Vector2i.ZERO)
-	
-	# move the active piece
-	var new=[]
-	for i in active_piece:
-		new.append(i+direction)
-	active_piece=new
-	
-	# put the active piece back on the board
-	for i in active_piece:
-		set_cell(1,i,active_piece_type,Vector2i.ZERO)
-	
-	place_hint()
+	# this order is important.
+	remove_active_piece() # first the piece must be removed so it can be moved.
+	active_piece_position+=direction # move the piece.
+	place_hint() # place the hint before placing the piece.
+	place_active_piece() # then place the piece.
+	# placing the piece after the hint means that when the piece and hint overlap, as
+	# they do when the piece is at the bottom, the piece is drawn over the top.
 
 var current_hint=[]
 func place_hint():
 	for i in current_hint:
 		set_cell(1,i,-1)
-	current_hint=active_piece.duplicate()
+	current_hint=[]
+	for i in rotated_array(piece_templates[active_piece_id],rotations[active_piece_rotation]).duplicate():
+		current_hint.append(i+active_piece_position)
 	while can_move_piece(Vector2i.DOWN,current_hint):
 		var x=[]
 		for i in current_hint:
 			x.append(i+Vector2i.DOWN)
 		current_hint=x
 	for i in current_hint:
-		set_cell(1,i,active_piece_type+8,Vector2i.ZERO)
+		set_cell(1,i,active_piece_id+pieces_ofset+8,Vector2i.ZERO)
 
-func can_move_piece(direction:Vector2i,piece=active_piece):
+func can_move_piece(direction:Vector2i,piece=null):
+	if piece==null:
+		# default to the active piece
+		piece=[]
+		for i in rotated_array(piece_templates[active_piece_id],rotations[active_piece_rotation]):
+			piece.append(i+active_piece_position)
 	for i in piece:
 		# if the cell is part of this piece
 		if i+direction in piece:
@@ -140,40 +202,26 @@ func setup(width,height):
 	for h in range(height):
 		for w in range(width):
 			set_cell(0,Vector2i(w+1,h+1),((((h+1)%2)+(w+1))%2)+1,Vector2i.ZERO)
-	
-	# set up the piece templates so that they start in the middle.
-	var new=[]
-	for i in piece_templates:
-		new.append([])
-		for a in i: #                 floor because tiles should tend left
-			new[-1].append(a+Vector2i(floor(width/2)+1,0))
-	piece_templates=new
 
 func next_piece():
 	"""
 	This method freezes the active piece and moves on to the next one.
 	"""
-	for i in active_piece:
-		set_cell(1,i,active_piece_type,Vector2i.ZERO)
-
-	var num=rng.randi_range(0,len(piece_templates)-1)
-	active_piece=piece_templates[num]
-	active_piece_type=num+3 # because there are three non-tetrominoes in the list (the border and the two backgrounds)
-	
-	for i in active_piece:
-		set_cell(1,i,active_piece_type,Vector2i.ZERO)
-	
+	# note the lack of the usual removing of the active piece.
+	active_piece_id=rng.randi_range(0,len(piece_templates)-1)
+	active_piece_position=Vector2i(floor(width/2)+1,0)
+	place_active_piece()
 	current_hint=[]
 
 func check_rows_for_deletion():
 	for row in range(1,height+1): # because second arg is exclusive and we want to start at 1.
 		var all_full=true
 		for cell in range(1,width+1): # same reason
-			if not get_cell_source_id(1,Vector2i(cell,row)) in cells:
+			if not get_cell_source_id(1,Vector2i(cell,row)) in range(pieces_ofset,len(piece_templates)+pieces_ofset):
 				all_full=false
 		if all_full:
 			for x in range(1,width+1):
-				if Vector2i(x,row) in active_piece:
+				if Vector2i(x,row)-active_piece_position in rotated_array(piece_templates[active_piece_id],rotations[active_piece_rotation]):
 					continue
 				set_cell(1,Vector2i(x,row),get_cell_source_id(1,Vector2i(x,row-1)),Vector2i.ZERO)
 				set_cell(1,Vector2i(x,row-1),-1)
@@ -187,7 +235,6 @@ func next_frame():
 		move_piece(Vector2i.DOWN)
 	else:
 		next_piece()
-	
 	check_rows_for_deletion()
 
 func _on_timer_timeout():
