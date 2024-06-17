@@ -53,22 +53,7 @@ var piece_templates:Array=[
 		Vector2i(0,0),
 	],
 ]
-var piece_centres:Array=[
-	# I
-	Vector2(0,1),
-	# J
-	Vector2(-0.5,0.5),
-	# L
-	Vector2(-0.5,0.5),
-	# O
-	Vector2(0,0),
-	# S
-	Vector2(-0.5,0.5),
-	# T
-	Vector2(-0.5,0.5),
-	# Z
-	Vector2(-0.5,0.5),
-]
+
 var rng=RandomNumberGenerator.new()
 
 func _ready():
